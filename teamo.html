@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Lluvia Matrix Fecha y Frase</title>
+  <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+  <div id="menu">
+    <label for="speedRange">Velocidad:</label>
+    <input type="range" id="speedRange" min="1" max="20" value="5">
+
+    <label for="phraseSelect">Frase:</label>
+    <select id="phraseSelect">
+      <option value="TEAMO">TEAMO</option>
+      <option value="MI VIDA">MI VIDA</option>
+      <option value="MI NIÑA">MI NIÑA</option>
+      <option value="MI NEGA">MI NEGA</option>
+      <option value="MY LOVE">MY LOVE</option>
+    </select>
+  </div>
+
+  <!-- Botón centrado -->
+  <button id="showFormBtn">Presione aquí</button>
+
+  <!-- Contenedor formulario oculto inicialmente -->
+  <div id="formContainer" class="hidden">
+    <h2>Ingrese sus datos</h2>
+
+    <label for="fecha">Fecha de aniversario</label>
+    <input type="text" id="fecha" placeholder="00/00/0000" autocomplete="off">
+
+    <label for="apodo">Nuestro apodo de pareja (mayúsculas)</label>
+    <input type="text" id="apodo" placeholder="MAYUSCULAS" autocomplete="off">
+
+    <label for="cita">¿En qué cita fue nuestro primer beso? (mayúsculas)</label>
+    <input type="text" id="cita" placeholder="MAYUSCULAS" autocomplete="off">
+
+    <button id="submitBtn">Enviar</button>
+  </div>
+
+  <canvas id="matrix"></canvas>
+
+  <script src="js/script.js"></script>
+</body>
+</html>

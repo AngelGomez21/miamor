@@ -1,0 +1,152 @@
+body {
+  margin: 0;
+  height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background-color: #000;
+  font-family: 'Courier New', monospace;
+}
+
+.envelope {
+  position: relative;
+  width: 300px;
+  height: 200px;
+  background: linear-gradient(135deg, #f8c8dc 0%, #f5aec9 100%);
+  border: 3px solid #e5a3c1;
+  cursor: pointer;
+  overflow: visible;
+  box-sizing: border-box;
+  border-radius: 8px;
+  box-shadow:
+    inset 0 0 15px rgba(255, 182, 193, 0.6),
+    0 4px 8px rgba(255, 105, 180, 0.4);
+  z-index: 10;
+}
+
+/* X decorativa del sobre */
+.envelope::before {
+  content: "";
+  position: absolute;
+  top: 0; left: 0; right: 0; bottom: 0;
+  pointer-events: none;
+  z-index: 5;
+  background:
+    linear-gradient(45deg, transparent 48%, #e5a3c1 48%, #e5a3c1 52%, transparent 52%),
+    linear-gradient(-45deg, transparent 48%, #e5a3c1 48%, #e5a3c1 52%, transparent 52%);
+  background-repeat: no-repeat;
+  background-size: 100% 2px;
+  background-position: top left, top right;
+  border-radius: 8px;
+}
+
+/* Solapa triangular */
+.flap {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 50%;
+  background: linear-gradient(135deg, #f9c9d9 0%, #f6abc8 100%);
+  cursor: pointer;
+  z-index: 20; /* para que esté sobre la X pero debajo de la carta cuando abierta */
+  box-shadow:
+    inset 0 2px 8px rgba(255, 255, 255, 0.7),
+    0 3px 8px rgba(255, 105, 180, 0.3);
+  clip-path: polygon(0% 0%, 100% 0%, 50% 100%);
+  transform-origin: center top;
+  transition: transform 0.6s ease;
+  border-radius: 8px 8px 0 0;
+}
+
+.flap::before,
+.flap::after {
+  content: "";
+  position: absolute;
+  width: 2px;
+  height: 100%;
+  background: #d18cae;
+  top: 0;
+  opacity: 0.7;
+}
+
+.flap::before {
+  left: 30%;
+  transform: rotate(15deg);
+  transform-origin: top left;
+}
+
+.flap::after {
+  right: 30%;
+  transform: rotate(-15deg);
+  transform-origin: top right;
+}
+
+.envelope.open .flap {
+  transform: rotateX(-180deg);
+  box-shadow: none;
+}
+
+/* Carta que pasa sobre la solapa */
+.letter {
+  position: absolute;
+  top: 80px; /* dentro del sobre (justo debajo de solapa) */
+  left: 50%;
+  width: 260px;
+  height: 160px;
+  background: #ffe6f0;
+  color: #4a2c43;
+  padding: 20px;
+  box-sizing: border-box;
+  font-size: 16px;
+  border-radius: 8px;
+  box-shadow: 0 0 12px rgba(255, 182, 193, 0.7);
+  transform: translate(-50%, 0);
+  z-index: 30; /* encima de la solapa */
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+/* Animación carta saliendo hacia arriba y bajando */
+.envelope.open .letter {
+  animation: slideOutLetter 1s ease forwards;
+}
+
+.envelope.closing .letter {
+  animation: slideInLetter 0.8s ease forwards;
+}
+
+@keyframes slideOutLetter {
+  0% {
+    top: 80px;
+    opacity: 0;
+  }
+  30% {
+    top: -50px;
+    opacity: 1;
+  }
+  100% {
+    top: 20px;
+    opacity: 1;
+  }
+}
+
+@keyframes slideInLetter {
+  0% {
+    top: 20px;
+    opacity: 1;
+  }
+  70% {
+    top: -50px;
+    opacity: 0.6;
+  }
+  100% {
+    top: 80px;
+    opacity: 0;
+  }
+}
+
+#message {
+  white-space: pre-wrap;
+}

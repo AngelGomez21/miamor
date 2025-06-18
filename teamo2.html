@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Carta Romántica</title>
+  <link rel="stylesheet" href="css/teamo2.css" />
+  <style>
+    /* Opcional: puedes poner aquí estilos CSS adicionales */
+  </style>
+</head>
+<body>
+  <div class="envelope" onclick="toggleEnvelope()">
+    <div class="flap"></div>
+    <div class="letter">
+      <div id="message"></div>
+    </div>
+  </div>
+
+  <!-- Canvas para corazones animados de fondo -->
+  <canvas id="heartCanvas" style="position: fixed; top:0; left:0; width:100%; height:100%; pointer-events:none; z-index:0;"></canvas>
+
+  <script>
+    let isOpen = false;
+    const envelope = document.querySelector('.envelope');
+    const messageEl = document.getElementById('message');
+    const message = "Mi vida...\nEste sobre guarda todo lo que siento por ti.\nCada palabra, cada latido, cada momento contigo. Gracias por todo.";
+
+    function toggleEnvelope() {
+      if (isOpen) {
+        envelope.classList.add('closing');
+        messageEl.innerText = '';
+
+        setTimeout(() => {
+          envelope.classList.remove('open');
+          envelope.classList.remove('closing');
+          isOpen = false;
+        }, 800);
+      } else {
+        envelope.classList.add('open');
+        isOpen = true;
+        writeMessage();
+      }
+    }
+
+    function writeMessage() {
+      messageEl.innerText = '';
+      let i = 0;
+      const interval = setInterval(() => {
+        if (i < message.length) {
+          messageEl.innerText += message[i++];
+        } else {
+          clearInterval(interval);
+        }
+      }, 40);
+    }
+
+    // Canvas setup
+    const canvas = document.getElementById('heartCanvas');
+    const ctx = canvas.getContext('2d');
+    let width, height;
+
+    function resize() {
+      width = canvas.width = window.innerWidth;
+      height = canvas.height = window.innerHeight;
+    }
+    window.addEventListener('resize', resize);
+    resize();
+
+    // Corazón que sube y desaparece
+    class Heart {
+      constructor() {
+        this.reset();
+      }
+      reset() {
+        this.x = Math.random() * width;
+        this.y = height + Math.random() * 100;
+        this.size = 10 + Math.random() * 10;
+        this.speed = 0.5 + Math.random() * 1.5;
+        this.opacity = 1;
+        this.opacitySpeed = 0.005 + Math.random() * 0.005;
+      }
+      draw() {
+        ctx.save();
+        ctx.fillStyle = `rgba(255, 105, 180, ${this.opacity.toFixed(2)})`;
+        ctx.beginPath();
+        const topCurveHeight = this.size * 0.3;
+        ctx.moveTo(this.x, this.y);
+        ctx.bezierCurveTo(this.x, this.y - topCurveHeight, this.x - this.size / 2, this.y - topCurveHeight, this.x - this.size / 2, this.y - this.size / 2);
+        ctx.bezierCurveTo(this.x - this.size / 2, this.y - this.size, this.x, this.y - this.size, this.x, this.y - this.size / 2);
+        ctx.bezierCurveTo(this.x, this.y - this.size, this.x + this.size / 2, this.y - this.size, this.x + this.size / 2, this.y - this.size / 2);
+        ctx.bezierCurveTo(this.x + this.size / 2, this.y - topCurveHeight, this.x, this.y - topCurveHeight, this.x, this.y);
+        ctx.closePath();
+        ctx.fill();
+        ctx.restore();
+      }
+      update() {
+        this.y -= this.speed;
+        this.opacity -= this.opacitySpeed;
+        if (this.opacity <= 0 || this.y + this.size < 0) {
+          this.reset();
+        }
+      }
+    }
+
+    const hearts = [];
+    for(let i = 0; i < 100; i++) hearts.push(new Heart());
+
+    // Destellos (onda expansiva) en forma de corazón al hacer click
+    class HeartWave {
+      constructor(x, y) {
+        this.x = x;
+        this.y = y;
+        this.maxSize = 60;
+        this.size = 10;
+        this.opacity = 0.8;
+        this.growthRate = 2;
+        this.fadeRate = 0.02;
+      }
+      draw() {
+        ctx.save();
+        ctx.strokeStyle = `rgba(255, 105, 180, ${this.opacity.toFixed(2)})`;
+        ctx.lineWidth = 3;
+        ctx.beginPath();
+        const s = this.size;
+        const x = this.x;
+        const y = this.y;
+        const topCurveHeight = s * 0.3;
+        ctx.moveTo(x, y);
+        ctx.bezierCurveTo(x, y - topCurveHeight, x - s / 2, y - topCurveHeight, x - s / 2, y - s / 2);
+        ctx.bezierCurveTo(x - s / 2, y - s, x, y - s, x, y - s / 2);
+        ctx.bezierCurveTo(x, y - s, x + s / 2, y - s, x + s / 2, y - s / 2);
+        ctx.bezierCurveTo(x + s / 2, y - topCurveHeight, x, y - topCurveHeight, x, y);
+        ctx.closePath();
+        ctx.stroke();
+        ctx.restore();
+      }
+      update() {
+        this.size += this.growthRate;
+        this.opacity -= this.fadeRate;
+        if(this.opacity <= 0) {
+          // Marcar para eliminar
+          this.dead = true;
+        }
+      }
+    }
+
+    const heartWaves = [];
+
+    window.addEventListener('click', e => {
+      heartWaves.push(new HeartWave(e.clientX, e.clientY));
+    });
+
+    // Animación general
+    function animate() {
+      ctx.clearRect(0, 0, width, height);
+
+      hearts.forEach(h => {
+        h.update();
+        h.draw();
+      });
+
+      for(let i = heartWaves.length - 1; i >= 0; i--) {
+        heartWaves[i].update();
+        heartWaves[i].draw();
+        if(heartWaves[i].dead) {
+          heartWaves.splice(i, 1);
+        }
+      }
+
+      requestAnimationFrame(animate);
+    }
+    animate();
+  </script>
+</body>
+</html>
